@@ -5,7 +5,7 @@ function setip() {
        
             <div class="comport-input" id="comPortInput" >
                 <label class="comport-label" for="comPortSelect">COM Port: </label>
-                <select class="swal2-select" id='comPortSelect'>
+                <select class="custom-swal-select" id='comPortSelect'>
                     <option value="WebSocket" selected>WebSocket</option>
                     <option value="SerialPort">SerialPort</option>
                 </select>
@@ -15,6 +15,9 @@ function setip() {
         showCancelButton: true,
         confirmButtonText: 'Set',
         showLoaderOnConfirm: true,
+        customClass: {
+            select: 'custom-swal-select',
+        },
         didOpen: () => {
             //ws.send(JSON.stringify({ get: "getcomlist" }));
             window.api.send("toMain", JSON.stringify({ get: "getcomlist" }));
@@ -49,4 +52,5 @@ window.api.receive("fromMain", (event) => {
             select.appendChild(option);
         }
     }
+
 });

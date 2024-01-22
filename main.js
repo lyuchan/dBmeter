@@ -1,11 +1,14 @@
 // Modules to control application life and create native browser window
 const SerialPort = require('serialport');
+const { ReadlineParser } = require('@serialport/parser-readline')
+
 let getserial
+let sport;
 const { Tray, Menu, app, BrowserWindow } = require('electron')
 const path = require('path')
 const { ipcMain } = require('electron')
 function createTray(win) {
-  const iconPath = path.join(__dirname, '/led.png');
+  const iconPath = path.join(__dirname, '/icon.png');
   const tray = new Tray(iconPath)
   const contextMenu = Menu.buildFromTemplate([
     {
@@ -37,7 +40,7 @@ function createWindow(w, h, preloadjs, mainpage) {
     }
   })
   mainWindow.loadFile(mainpage)
-  mainWindow.webContents.openDevTools()
+  //mainWindow.webContents.openDevTools()//!!!devtools!!!
   return mainWindow;
 }
 app.whenReady().then(() => {
@@ -55,11 +58,51 @@ app.whenReady().then(() => {
         send(JSON.stringify({ get: "comlist", data: data }))
       })
     }
+    if (res.get == "setcom") {
+      console.log(res.data);
+      connectToSerialPort(res.data);
+    }
   });
   function send(sendData) {
     win.webContents.send("fromMain", sendData);
   }
+  function connectToSerialPort(portName) {
+    if (sport) {
+      sport.close();
+    }
+    sport = new SerialPort.SerialPort({ path: portName, baudRate: 9600 });
 
+    // const parser = new Readline();
+    // port.pipe(parser);
+    const parser = sport.pipe(new ReadlineParser({ delimiter: '\r\n' }));
+    sport.on('open', () => {
+      console.log('串列通訊埠已開啟');
+      sport.set({ dtr: false }, (err) => {
+        if (err) {
+          console.error('Error setting DTR:', err);
+        } else {
+          console.log('DTR set to HIGH');
+        }
+        // 在這裡可以進行串列通訊埠的讀寫操作
+      });
+    });
+
+    parser.on('data', (data) => {
+
+      if (data > 140) {
+        console.log("error");
+      } else {
+        send(JSON.stringify({ get: "updatedb", data: data }))
+      }
+
+    });
+    sport.on('error', err => {
+      console.error(`无法打开串口 ${portName}:`, err);
+      if (err = `[Error: Opening ${portName}: Access denied]`) {
+        send(JSON.stringify({ uuid: "web", token: base64code, get: "error", data: (`${portName}已被其他軟體占用`) }))
+      }
+    });
+  }
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

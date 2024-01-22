@@ -4,7 +4,9 @@
   "description": "A minimal Electron application",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
   },
   "repository": "https://github.com/electron/electron-quick-start",
   "keywords": [
@@ -17,9 +19,27 @@
   "author": "GitHub",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^28.1.4"
+    "electron": "^28.1.4",
+    "electron-builder": "^24.9.1"
   },
   "dependencies": {
     "serialport": "^12.0.0"
+  },
+  "build": {
+    "appId": "com.TallyLight.app",
+    "productName": "TallyLight",
+    "directories": {
+      "output": "pack"
+    },
+    "files": [
+      "**/*",
+      "!.vscode",
+      "build/",
+      "data/"
+    ],
+    "asar": false,
+    "win": {
+      "icon": "./icon.png"
+    }
   }
 }

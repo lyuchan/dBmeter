@@ -13,6 +13,7 @@ body {
     background-color: #000000;
     user-select: none;
     overflow: hidden;
+    transition: background-color 0.5s ease;
 }
 
 p {
@@ -107,7 +108,7 @@ p {
     background-color: #262626;
     font-size: 20px;
     font-weight: bold;
-    padding: 23px 20px;
+    padding: 8px 20px;
     overflow: hidden;
 }
 
@@ -398,12 +399,20 @@ tr:last-child td:last-child {
     display: flex;
     align-items: center;
     justify-content: center;
+    /* -webkit-text-stroke: 0.1vw black;*/
     margin: -40px;
     /* 可能还需要调整 margin */
     padding: 0;
     /* 可能还需要调整 padding */
 }
 
-.swal2-select {
+.custom-swal-select {
     background: #323232;
+    min-width: 50%;
+    max-width: 100%;
+    padding: 0.375em 0.625em;
+
+    /* background: rgba(0,0,0,0);*/
+    color: inherit;
+    font-size: 1.125em;
 }
