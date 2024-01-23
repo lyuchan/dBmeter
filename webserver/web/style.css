@@ -1,0 +1,126 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400&display=swap');
+
+
+/* swal custom */
+.swal2-popup {
+    background-color: #16212e !important;
+    color: aliceblue !important;
+    border-radius: 15px !important;
+    z-index: 999 !important;
+    justify-items: center !important;
+}
+
+.swal2-title{
+    padding-top: 0 !important;
+}
+
+.swal2-toast {
+    border-radius: 10px !important;
+    background-color: #25313f !important;
+}
+
+.swal2-confirm {
+    border-radius: 5px !important;
+    background-color: #03AE85 !important;
+}
+
+.swal2-cancel {
+    border-radius: 5px !important;
+    background-color: #FD6259 !important;
+}
+
+.swal2-actions {
+    gap: 25px !important;
+}
+
+.swal2-input {
+    background-color: #16212e !important;
+    border-radius: 10px !important;
+}
+
+.swal2-html-container{
+    margin-top: 0 !important;
+}
+
+.swal2-styled.swal2-confirm:focus {
+    box-shadow: 0 0 0 0;
+}
+
+.swal2-show {
+    animation: show .15s !important;
+}
+
+.swal2-hide {
+    animation: hide .15s !important;
+}
+
+.swal2-validation-message {
+    background-color: #16212e !important;
+    color: #FFFFFF !important;
+}
+
+.swal2-backdrop-show {
+    background: rgba(0, 0, 0, .6) !important;
+}
+
+.swal2-bottom-right {
+    background: none !important;
+}
+
+.swal2-timer-progress-bar {
+    background-color: #e6564e !important;
+}
+
+
+@keyframes show {
+    0% {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+
+@keyframes hide {
+    0% {
+        transform: scale(1);
+        opacity: 1
+    }
+
+    100% {
+        transform: scale(0.95);
+        opacity: 0
+    }
+}
+
+p,
+h1,
+h2,
+h3 {
+    margin: 0;
+
+}
+
+body {
+    font-family: 'Roboto Mono', monospace;
+    margin: 0;
+    background-color: #01131E;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+input {
+    font-family: 'Roboto Mono', monospace;
+}
+
+.title{
+    font-size: 30px;
+}
+
+.sub-title{
+    font-size: 20px;
+}
