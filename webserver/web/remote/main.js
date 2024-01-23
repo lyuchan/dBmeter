@@ -28,18 +28,20 @@ ws.onopen = () => {
 }
 ws.onmessage = event => {
     let res = JSON.parse(event.data);
-    if (res.token == token) {
-        if (res.get == "updatedb") {
-            let text = document.getElementById("text");
-            text.innerHTML = `${res.data}dB`
-            changeBodyColor(res.data)
-        }
-        if (res.get == "error") {
-            if (res.uuid == "web") {
-                Toast.fire({
-                    icon: 'error',
-                    title: res.data
-                })
+    if (res.service == "dbmeter") {
+        if (res.token == token) {
+            if (res.get == "updatedb") {
+                let text = document.getElementById("text");
+                text.innerHTML = `${res.data}dB`
+                changeBodyColor(res.data)
+            }
+            if (res.get == "error") {
+                if (res.uuid == "web") {
+                    Toast.fire({
+                        icon: 'error',
+                        title: res.data
+                    })
+                }
             }
         }
     }
