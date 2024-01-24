@@ -15,6 +15,43 @@
 
 <body style="background-color: #01131e;">
     <script>
+        let urlold = window.location.href//取得當前網址
+        let url = urlold.replace("https://", "");//去除https
+        url = url.replace("http://", "");//去除http
+        url = url.replace("dbmeter", "");//去除/
+        url = url.split('/')[0];
+        url = url.replace("/", "");//去除/
+        url2 = url
+        url = "ws://" + url;//加入ws://
+        let first = 0;
+        var ws = new ReconnectingWebSocket(url)
+        ws.reconnectDecay = 1;
+        ws.onopen = () => {
+            //src2.innerHTML = "<h2>已與伺服器連線</h2>"
+            if (first == 0) {
+                first++;
+
+            } else {
+
+            }
+        }
+        ws.onmessage = event => {
+            let res = JSON.parse(event.data);
+            if (res.service == "dbmeter") {
+                if (res.get == "checktoken") {
+                    if (res.token == token) {
+                        document.location.href = `./remote?token=${token}`;
+                    }
+                }
+            }
+        }
+        ws.onerror = (error) => {
+
+        };
+        ws.onclose = () => {
+
+        }
+
         Swal.fire({
             title: `
                 <h1 class="title">分貝計<br><span style='font-size:25px'>遠端監控軟體</h1>
@@ -32,7 +69,12 @@
             preConfirm: (login) => {
                 //post to /login
                 console.log(login)
-                document.location.href = `./remote?token=${login}`;
+                ws.send(JSON.stringify({ service: "dbmeter", get: "checktoken", token: login }));
+                const timeoutId = setTimeout(() => {
+                    clearTimeout(timeoutId); // 清除計時器
+                    Swal.showValidationMessage('未有主機端使用此代碼');
+                }, 500);
+
             },
         }).then((result) => {
             if (result.isDismissed) {

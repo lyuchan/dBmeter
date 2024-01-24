@@ -1,7 +1,15 @@
 // Modules to control application life and create native browser window
 const SerialPort = require('serialport');
 const { ReadlineParser } = require('@serialport/parser-readline')
+const fs = require('fs');
+var crypto = require('crypto');
+var buf = crypto.randomBytes(6);
+let base64code = buf.toString('base64');
 
+var ws = require("ws");
+//remote url
+
+//let remoteurl="ws://this.is_your_ws_ip"
 let getserial
 let sport;
 const { Tray, Menu, app, BrowserWindow } = require('electron')
@@ -47,7 +55,27 @@ app.whenReady().then(() => {
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
-  const win = createWindow(900, 400, 'preload.js', './web/index.html');
+  const win = createWindow(900, 600, 'preload.js', './web/index.html');
+  const configFilePath = 'config.json';
+  fs.access(configFilePath, fs.constants.F_OK, (err) => {
+    if (err) {
+      updatetoken();
+      console.log(`remote code: ${base64code}`);
+    } else {
+      fs.readFile('config.json', 'utf8', (err, data) => {
+        if (err) {
+          console.error('read config file error:', err);
+          return;
+        }
+        // 將 JSON 字串轉換為物件
+        const config = JSON.parse(data);
+        // 使用 config 物件進行你的操作
+        //console.log('讀取到的設定:', config);
+        base64code = config.id;
+        console.log(`remote code: ${base64code}`);
+      });
+    }
+  });
 
   ipcMain.on("toMain", (event, args) => {
     //tomain
@@ -62,7 +90,72 @@ app.whenReady().then(() => {
       console.log(res.data);
       connectToSerialPort(res.data);
     }
+    if (res.get == "token") {
+      send(JSON.stringify({ token: base64code, get: "token", data: base64code }))
+    }
+    if (res.get == "updatetoken") {
+      updatetoken();
+    }
   });
+  function cws() {
+    sock2 = new ws(remoteurl);
+    sock2.on("open", function () {
+      console.log("connect success !!!!");
+      // sock.send("HelloWorld");
+    });
+
+    sock2.on("error", function (err) {
+      console.log("error: ", err);
+    });
+
+    sock2.on("close", function () {
+      console.log("close");
+      setTimeout(() => {
+        console.log('正在重新連接...');
+        cws(); // 遞迴重新連接
+      }, 1000);
+    });
+
+    sock2.on("message", function (event) {
+      let res = JSON.parse(event.toString());
+      if (res.service == "dbmeter") {
+        if (res.get == "checktoken") {
+          if(res.token==base64code){
+            sendws({ service: "dbmeter", get: "checktoken", token: base64code })
+          }
+        }
+      }
+    });
+  }
+  cws();
+
+  function updatetoken() {
+    buf = crypto.randomBytes(6);
+    let test = buf.toString('base64url');
+    test = test.toLowerCase()
+    if (test.indexOf("+") != -1 | test.indexOf("-") != -1 | test.indexOf("_") != -1) {
+      // console.log(test)
+      updatetoken();
+    } else {
+      base64code = test
+      send(JSON.stringify({ token: base64code, get: "token", data: base64code }))
+      const updatedConfig = JSON.stringify({
+        "id": base64code
+      });
+      // 寫入回 config.json 檔案
+      fs.writeFile('config.json', updatedConfig, 'utf8', (err) => {
+        if (err) {
+          console.error('config write error:', err);
+          return;
+        }
+        //   console.log('設定已成功更新！');
+      });
+    }
+
+  }
+  function sendws(data) {
+    sock2.send(data);
+  }
   function send(sendData) {
     win.webContents.send("fromMain", sendData);
   }
@@ -93,6 +186,7 @@ app.whenReady().then(() => {
         console.log("error");
       } else {
         send(JSON.stringify({ get: "updatedb", data: data }))
+        sendws(JSON.stringify({ service: "dbmeter", token: base64code, get: "updatedb", data: data }))
       }
 
     });
