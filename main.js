@@ -118,10 +118,11 @@ app.whenReady().then(() => {
 
     sock2.on("message", function (event) {
       let res = JSON.parse(event.toString());
+      console.log(res)
       if (res.service == "dbmeter") {
-        if (res.get == "checktoken") {
-          if(res.token==base64code){
-            sendws({ service: "dbmeter", get: "checktoken", token: base64code })
+        if (res.get == "checktokens") {
+          if (res.token == base64code) {
+            sendws(JSON.stringify({ service: "dbmeter", get: "checktoken", token: base64code }))
           }
         }
       }

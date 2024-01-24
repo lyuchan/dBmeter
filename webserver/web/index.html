@@ -10,11 +10,14 @@
     <title>Control Panel login</title>
     <script src="./src/sweetalert2.min.js"></script>
     <link rel="stylesheet" href="./src/sweetalert2.min.css">
+    <script src="./src/reconnecting-websocket.min.js"></script>
     <link rel="stylesheet" href="./style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body style="background-color: #01131e;">
     <script>
+        let token;
         let urlold = window.location.href//取得當前網址
         let url = urlold.replace("https://", "");//去除https
         url = url.replace("http://", "");//去除http
@@ -41,6 +44,7 @@
                 if (res.get == "checktoken") {
                     if (res.token == token) {
                         document.location.href = `./remote?token=${token}`;
+                        console.log('good')
                     }
                 }
             }
@@ -51,7 +55,6 @@
         ws.onclose = () => {
 
         }
-
         Swal.fire({
             title: `
                 <h1 class="title">分貝計<br><span style='font-size:25px'>遠端監控軟體</h1>
@@ -61,24 +64,40 @@
             inputAttributes: {
                 autocapitalize: 'off'
             },
+            customClass: {
+                select: 'custom-swal-select',
+            },
             showCancelButton: true,
             confirmButtonText: 'Login',
-            showLoaderOnConfirm: true,
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            preConfirm: (login) => {
+            //showLoaderOnConfirm: false,
+
+            // allowOutsideClick: false,
+            // allowEscapeKey: false,
+            preConfirm: async (login) => {
                 //post to /login
+                token = login
                 console.log(login)
-                ws.send(JSON.stringify({ service: "dbmeter", get: "checktoken", token: login }));
-                const timeoutId = setTimeout(() => {
-                    clearTimeout(timeoutId); // 清除計時器
-                    Swal.showValidationMessage('未有主機端使用此代碼');
-                }, 500);
+                await new Promise((resolve) => {
+                    setTimeout(() => {
+                        ws.send(JSON.stringify({ service: "dbmeter", get: "checktokens", token: login }));
+                        resolve();
+                    }, 10);
+                });
+
+                await new Promise((resolve) => {
+                    setTimeout(() => {
+                        //  a();
+                        //  Swal.hideLoading();
+                        console.log("End preConfirm");
+                        Swal.showValidationMessage('未有主機端使用此代碼');
+                        resolve();
+                    }, 1000);
+                });
 
             },
         }).then((result) => {
             if (result.isDismissed) {
-                window.history.back();
+                window.location.reload();
             }
         })
     </script>
