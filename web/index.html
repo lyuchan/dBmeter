@@ -255,7 +255,7 @@
 
      function qrcode() {
           var token = document.getElementById("token").value;
-          var url = `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=http://remote.lyuchan.com:8083/dbmeter/remote?token=${token}&choe=UTF-8&chld=H|1`
+          var url = `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=http://lyuchan.com/db/remote?token=${token}&choe=UTF-8&chld=H|1`
           if (token == "") {
                document.getElementById("qr").style.display = "none";
                Swal.showValidationMessage(
