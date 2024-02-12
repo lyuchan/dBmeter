@@ -5,10 +5,10 @@ const fs = require('fs');
 var crypto = require('crypto');
 var buf = crypto.randomBytes(6);
 let base64code = buf.toString('base64');
-
+let wsserverflag = false;
 var ws = require("ws");
 //remote url
-
+let remoteurl = "ws://remote.lyuchan.com:8083"
 //let remoteurl="ws://this.is_your_ws_ip"
 let getserial
 let sport;
@@ -91,6 +91,10 @@ app.whenReady().then(() => {
       connectToSerialPort(res.data);
     }
     if (res.get == "token") {
+      if (!wsserverflag) {
+        cws();
+        wsserverflag = true;
+      }
       send(JSON.stringify({ token: base64code, get: "token", data: base64code }))
     }
     if (res.get == "updatetoken") {
@@ -106,14 +110,12 @@ app.whenReady().then(() => {
 
     sock2.on("error", function (err) {
       console.log("error: ", err);
+
     });
 
     sock2.on("close", function () {
       console.log("close");
-      setTimeout(() => {
-        console.log('正在重新連接...');
-        cws(); // 遞迴重新連接
-      }, 1000);
+      wsserverflag = false;
     });
 
     sock2.on("message", function (event) {
@@ -128,7 +130,7 @@ app.whenReady().then(() => {
       }
     });
   }
-  cws();
+
 
   function updatetoken() {
     buf = crypto.randomBytes(6);
@@ -164,7 +166,7 @@ app.whenReady().then(() => {
     if (sport) {
       sport.close();
     }
-    sport = new SerialPort.SerialPort({ path: portName, baudRate: 9600 });
+    sport = new SerialPort.SerialPort({ path: portName, baudRate: 2400 });
 
     // const parser = new Readline();
     // port.pipe(parser);
@@ -180,16 +182,29 @@ app.whenReady().then(() => {
         // 在這裡可以進行串列通訊埠的讀寫操作
       });
     });
-
+    let db = 0;
     parser.on('data', (data) => {
+      let res = data.split(",")
+      let voltage = res[0];
+      let getdb = res[1];
 
-      if (data > 140) {
-        console.log("error");
-      } else {
-        send(JSON.stringify({ get: "updatedb", data: data }))
-        sendws(JSON.stringify({ service: "dbmeter", token: base64code, get: "updatedb", data: data }))
+      if (!isNaN(getdb)) {
+        db = (parseFloat(getdb) + 1.7).toFixed(1);
       }
-
+      if (db < 20) {
+        send(JSON.stringify({ get: "updatedb", data: 0 }))
+        if (wsserverflag) {
+          sendws(JSON.stringify({ service: "dbmeter", token: base64code, get: "updatedb", data: 0 }))
+        }
+      } else if (db > 140) {
+        console.log("error")
+      } else {
+        send(JSON.stringify({ get: "updatedb", data: db }))
+        if (wsserverflag) {
+          sendws(JSON.stringify({ service: "dbmeter", token: base64code, get: "updatedb", data: db }))
+        }
+      }
+      send(JSON.stringify({ get: "updatevoltage", data: voltage }))
     });
     sport.on('error', err => {
       console.error(`无法打开串口 ${portName}:`, err);

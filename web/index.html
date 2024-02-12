@@ -198,25 +198,83 @@
                </svg>
           </button>
      </div>
+     <div class="text2">
+          <h1 id="text" class="text">連線中</h1>
+     </div>
+     <div class="batt">
 
-     <h1 id="text" class="text">連線中</h1>
+          <h2 id="batt" class="batttxt"></h2>
+     </div>
+
+
+
+
+
 </body>
 <script>
      //enter to login
+     let vflag = false;
+     function getColorForPercentage(percentage) {
+          if (percentage < 10) {
+               return '#52F037';
+          } else if (percentage < 20) {
+               return '#97ED26';
+          } else if (percentage < 30) {
+               return '#C4EF2F';
+          } else if (percentage < 40) {
+               return '#F2E735';
+          } else if (percentage < 50) {
+               return '#F5BD43';
+          } else if (percentage < 60) {
+               return '#F4B31E';
+          } else if (percentage < 70) {
+               return '#F09F30';
+          } else if (percentage < 80) {
+               return '#F07D30';
+          } else if (percentage < 90) {
+               return '#F26035';
+          } else {
+               return '#F54B42';
+          }
+     }
      window.api.receive("fromMain", (event) => {
           const res = JSON.parse(event);
           if (res.get == "updatedb") {
                let text = document.getElementById("text");
-               text.innerHTML = `${res.data}dB`
-               changeBodyColor(res.data)
+               if (res.data == 0) {
+                    var textColor = 'rgb(255,255,255)';
+                    document.getElementById("text").style.color = textColor;
+                    document.getElementById("text").style.fontSize = "calc(10vw + 5vh)";
+                    text.innerHTML = "未連接分貝計"
+                    vflag = false;
+               } else {
+                    text.innerHTML = `${res.data}dB`
+                    changeBodyColor(res.data)
+                    document.getElementById("text").style.fontSize = "calc(20vw + 5vh)";
+                    vflag = true;
+               }
           }
           if (res.get == "token") {
                document.getElementById("token").value = res.data;
           }
+          if (res.get == "updatevoltage") {
+               let v = res.data
+               if (v >= 100) {
+                    v = 100;
+               }
+               if (vflag) {
+                    document.getElementById("batt").innerHTML = `${v}%`;
+                    document.getElementById("batt").style.color = getColorForPercentage(100 - v);
+               } else {
+                    document.getElementById("batt").innerHTML = '';
+                    document.getElementById("batt").style.color = getColorForPercentage(100 - v);
+               }
+          }
+
      });
      function changeBodyColor(value) {
           // 将值映射到0到1之间
-          var normalizedValue = (value - 30) / (130 - 30);
+          var normalizedValue = (value - 30) / (110 - 30);
           var red, green, blue;
 
           if (normalizedValue <= 0.5) {

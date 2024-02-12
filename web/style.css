@@ -401,10 +401,59 @@ tr:last-child td:last-child {
     align-items: center;
     justify-content: center;
     /* -webkit-text-stroke: 0.1vw black;*/
-    margin: -40px;
+    margin: 15px;
     /* 可能还需要调整 margin */
     padding: 0;
     /* 可能还需要调整 padding */
+}
+
+/* 當視窗寬度小於600px時，使用這個CSS */
+@media only screen and (max-width: 1000px) {
+    .text2 {
+        font-size: calc(20vw + 5vh);
+        text-align: center;
+        font-weight: bold;
+        height: 65vw;
+        display: flex;
+
+        justify-content: center;
+        /* -webkit-text-stroke: 0.1vw black;*/
+        margin: -74px;
+        /* 可能还需要调整 margin */
+        padding: 0;
+        /* 可能还需要调整 padding */
+    }
+}
+
+/* 當視窗寬度大於或等於600px時，使用這個CSS */
+@media only screen and (min-width: 1000px) {
+    .text2 {
+        font-size: calc(20vw + 5vh);
+        text-align: center;
+        font-weight: bold;
+        height: 48vw;
+        display: flex;
+
+        justify-content: center;
+        /* -webkit-text-stroke: 0.1vw black;*/
+        margin: -74px;
+        /* 可能还需要调整 margin */
+        padding: 0;
+        /* 可能还需要调整 padding */
+    }
+}
+
+
+
+.batt {
+    display: flex;
+    align-items: center
+}
+
+
+.batttxt {
+    color: white;
+    font-size: calc(3vw + 1vh);
 }
 
 .custom-swal-select {
